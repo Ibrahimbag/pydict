@@ -26,26 +26,30 @@ class Parse_Dictionary:
                 related_words = meaning[2]
                 examples = meaning[3]
 
-                output.append(part_of_speech)
-                output.append("<br>")
-                output.append(explanation)
-                output.append("<br>")
+                if part_of_speech:
+                    output.append(part_of_speech)
+                    output.append("<br><br>")
+                if explanation:
+                    output.append(explanation)
+                    output.append("<br><br>")
 
+                output.append("Related words:<br>")
                 for related_word in related_words:
                     output.append(related_word)
                     output.append(", ")
                 output.pop()
-                output.append("<br>")
 
+                output.append("<br><br>Examples:<br>")
                 for example in examples:
                     output.append(example)
-                    output.append(", ")
+                    output.append("<br><br>")
                 output.pop()
 
                 # Only add separator if not the last meaning
                 if meaning != self.data[word]["MEANINGS"][-1]:
                     output.append("<br><hr>")
-                output.append("<br>")
+                else:
+                    output.append("<br>")
         else:
             return "No meanings found"
 
