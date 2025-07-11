@@ -1,6 +1,6 @@
 # PyDict
 
-A simple English dictionary written in Python using Pyside module \
+A simple English dictionary written in Python using Pyside module
 
 ## Installation (Linux)
 
