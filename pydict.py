@@ -39,6 +39,7 @@ class Parse_Dictionary:
                     output.append(", ")
                 output.pop()
 
+                # TODO: Fix a lot of line breaks when there are no related words example word: search
                 output.append("<br><br>Examples:<br>")
                 for example in examples:
                     output.append(example)
@@ -90,6 +91,10 @@ class Widget(QtWidgets.QWidget, Parse_Dictionary):
         self.engine = pyttsx3.init()
 
         self.search_box = QtWidgets.QLineEdit()
+        validator = QtGui.QRegularExpressionValidator(
+            QtCore.QRegularExpression(r"[a-zA-Z]+")
+        )
+        self.search_box.setValidator(validator)
         self.search_box.setPlaceholderText("Type to search...")
         self.search_box.textChanged.connect(self.search_box_changed)
 
