@@ -1,6 +1,7 @@
 import sys
 import json
-from PySide6 import QtCore, QtWidgets
+import pyttsx3
+from PySide6 import QtCore, QtWidgets, QtGui
 
 
 class Parse_Dictionary:
@@ -64,7 +65,7 @@ class Parse_Dictionary:
 
     def get_synonym(self, word):
         word = word.upper()
-        
+
         output = []
         if self.data[word]["SYNONYMS"]:
             for synonym in self.data[word]["SYNONYMS"]:
@@ -82,6 +83,7 @@ class Widget(QtWidgets.QWidget, Parse_Dictionary):
         super().__init__()
 
         self.parser = self
+        self.engine = pyttsx3.init()
 
         self.search_box = QtWidgets.QLineEdit()
         self.search_box.setPlaceholderText("Type to search...")
@@ -111,6 +113,13 @@ class Widget(QtWidgets.QWidget, Parse_Dictionary):
         word_label = QtWidgets.QLabel(f"<h1>{word.capitalize()}</h1>")
         content_layout.addWidget(word_label)
 
+        button = QtWidgets.QPushButton("")
+        button.clicked.connect(lambda: self.on_button_click(word))
+        button.setFixedSize(24, 24)
+        icon = QtGui.QIcon("volume-icon.png")
+        button.setIcon(icon)
+        content_layout.addWidget(button)
+
         try:
             meanings_label = QtWidgets.QLabel(f"<b>Meanings:</b><br>{meanings}")
             meanings_label.setWordWrap(True)
@@ -127,6 +136,11 @@ class Widget(QtWidgets.QWidget, Parse_Dictionary):
             pass
 
         self.scroll_area.setWidget(content_widget)
+
+    @QtCore.Slot()
+    def on_button_click(self, word):
+        self.engine.say(word)
+        self.engine.runAndWait()
 
 
 def main():
