@@ -1,7 +1,17 @@
 import sys
 import json
 import pyttsx3
-from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtCore import Slot, QRegularExpression
+from PySide6.QtGui import QIcon, QRegularExpressionValidator
+from PySide6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QVBoxLayout,
+    QLineEdit,
+    QLabel,
+    QPushButton,
+    QScrollArea,
+)
 
 
 class Parse_Dictionary:
@@ -83,31 +93,29 @@ class Parse_Dictionary:
         return "".join(output)
 
 
-class Widget(QtWidgets.QWidget, Parse_Dictionary):
+class Widget(QWidget, Parse_Dictionary):
     def __init__(self):
         super().__init__()
 
         self.parser = self
         self.engine = pyttsx3.init()
 
-        self.search_box = QtWidgets.QLineEdit()
-        validator = QtGui.QRegularExpressionValidator(
-            QtCore.QRegularExpression(r"[a-zA-Z]+")
-        )
-        self.search_box.setValidator(validator)
-        self.search_box.setPlaceholderText("Type to search...")
-        self.search_box.textChanged.connect(self.search_box_changed)
+        search_box = QLineEdit()
+        validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z]+"))
+        search_box.setValidator(validator)
+        search_box.setPlaceholderText("Type to search...")
+        search_box.textChanged.connect(self.search_box_changed)
 
-        content_widget = QtWidgets.QWidget()
-        self.scroll_area = QtWidgets.QScrollArea()
+        content_widget = QWidget()
+        self.scroll_area = QScrollArea()
         self.scroll_area.setWidget(content_widget)
         self.scroll_area.setWidgetResizable(True)
 
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.search_box)
-        self.layout.addWidget(self.scroll_area)
+        layout = QVBoxLayout(self)
+        layout.addWidget(search_box)
+        layout.addWidget(self.scroll_area)
 
-    @QtCore.Slot()
+    @Slot()
     def search_box_changed(self, word):
         try:
             meanings = self.parser.get_meanings(word)
@@ -116,29 +124,29 @@ class Widget(QtWidgets.QWidget, Parse_Dictionary):
         except KeyError:
             pass
 
-        content_widget = QtWidgets.QWidget()
-        content_layout = QtWidgets.QVBoxLayout(content_widget)
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
 
-        word_label = QtWidgets.QLabel(f"<h1>{word.capitalize()}</h1>")
+        word_label = QLabel(f"<h1>{word.capitalize()}</h1>")
         content_layout.addWidget(word_label)
 
-        button = QtWidgets.QPushButton("")
+        button = QPushButton("")
         button.clicked.connect(lambda: self.on_button_click(word))
         button.setFixedSize(24, 24)
-        icon = QtGui.QIcon("volume-icon.png")
+        icon = QIcon("volume-icon.png")
         button.setIcon(icon)
         content_layout.addWidget(button)
 
         try:
-            meanings_label = QtWidgets.QLabel(f"<b>Meanings:</b><br>{meanings}")
+            meanings_label = QLabel(f"<b>Meanings:</b><br>{meanings}")
             meanings_label.setWordWrap(True)
             content_layout.addWidget(meanings_label)
 
-            anytonyms_label = QtWidgets.QLabel(f"<b>Antonyms:</b><br>{anytonyms}")
+            anytonyms_label = QLabel(f"<b>Antonyms:</b><br>{anytonyms}")
             anytonyms_label.setWordWrap(True)
             content_layout.addWidget(anytonyms_label)
 
-            synonyms_label = QtWidgets.QLabel(f"<b>Synonyms:</b><br>{synonyms}")
+            synonyms_label = QLabel(f"<b>Synonyms:</b><br>{synonyms}")
             synonyms_label.setWordWrap(True)
             content_layout.addWidget(synonyms_label)
         except UnboundLocalError:
@@ -146,14 +154,14 @@ class Widget(QtWidgets.QWidget, Parse_Dictionary):
 
         self.scroll_area.setWidget(content_widget)
 
-    @QtCore.Slot()
+    @Slot()
     def on_button_click(self, word):
         self.engine.say(word)
         self.engine.runAndWait()
 
 
 def main():
-    app = QtWidgets.QApplication([])
+    app = QApplication([])
 
     widget = Widget()
     widget.setStyleSheet("background-color: #F4F6F8;")
