@@ -6,7 +6,7 @@ A simple English dictionary written in Python using the PySide module
 
 ```sh
 # NOTE: libxcb-cursor-dev is only for X11 on Linux
-sudo apt install -y python3 python3-pip libxcb-cursor-dev espeak espeak-ng alsa-utils git
+sudo apt install -y python3 python3-pip libxcb-cursor-dev espeak-ng libespeak1 alsa-utils git
 pip install pyside6 pyttsx3
 git clone https://github.com/Ibrahimbag/dictionary.git
 cd pydict
