@@ -1,6 +1,7 @@
 import sys
 import json
 import pyttsx3
+import sqlite3
 from PySide6.QtCore import Slot, QRegularExpression
 from PySide6.QtGui import QIcon, QRegularExpressionValidator
 from PySide6.QtWidgets import (
@@ -11,7 +12,44 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
+    QHBoxLayout,
+    QErrorMessage,
 )
+
+
+class Bookmarks_Db:
+    def __init__(self):
+        self.conn = sqlite3.connect("bookmarks.db")
+
+        self.sql_statements = {
+            "create_table": """CREATE TABLE IF NOT EXISTS word_list (
+                word TEXT UNIQUE NOT NULL
+            );""",
+            "insert_word": "INSERT INTO word_list(word) VALUES(?)",
+            "delete_word": "DELETE FROM word_list WHERE word == ?",
+        }
+
+    def create_db(self):
+        cursor = self.conn.cursor()
+        cursor.execute(self.sql_statements["create_table"])
+        self.conn.commit()
+
+    def insert_db(self, word):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(self.sql_statements["insert_word"], (word,))
+            self.conn.commit()
+        except sqlite3.IntegrityError:
+            return False
+        return True
+
+    def delete_db(self, word):
+        cursor = self.conn.cursor()
+        cursor.execute(self.sql_statements["delete_word"], (word,))
+        self.conn.commit()
+
+    def close_db(self):
+        self.conn.close()
 
 
 class Parse_Dictionary:
@@ -93,9 +131,11 @@ class Parse_Dictionary:
         return "".join(output)
 
 
-class Widget(QWidget, Parse_Dictionary):
+class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
     def __init__(self):
-        super().__init__()
+        QWidget.__init__(self)
+        Parse_Dictionary.__init__(self)
+        Bookmarks_Db.__init__(self)
 
         self.parser = self
         self.engine = pyttsx3.init()
@@ -130,12 +170,25 @@ class Widget(QWidget, Parse_Dictionary):
         word_label = QLabel(f"<h1>{word.capitalize()}</h1>")
         content_layout.addWidget(word_label)
 
-        button = QPushButton("")
-        button.clicked.connect(lambda: self.on_button_click(word))
-        button.setFixedSize(24, 24)
-        icon = QIcon("volume-icon.png")
-        button.setIcon(icon)
-        content_layout.addWidget(button)
+        button_layout = QHBoxLayout()
+
+        tts_button = QPushButton("")
+        tts_button.clicked.connect(lambda: self.tts_button_click(word))
+        tts_button.setFixedSize(24, 24)
+        tts_icon = QIcon("volume-icon.png")
+        tts_button.setIcon(tts_icon)
+        tts_button.setToolTip("Read this word")
+        button_layout.addWidget(tts_button)
+
+        bookmark_button = QPushButton("")
+        bookmark_button.clicked.connect(lambda: self.bookmark_button_click(word))
+        bookmark_button.setFixedSize(24, 24)
+        bookmark_icon = QIcon("bookmark.png")
+        bookmark_button.setIcon(bookmark_icon)
+        bookmark_button.setToolTip("Bookmark this word")
+        button_layout.addWidget(bookmark_button)
+
+        content_layout.addLayout(button_layout)
 
         try:
             meanings_label = QLabel(f"<b>Meanings:</b><br>{meanings}")
@@ -155,9 +208,24 @@ class Widget(QWidget, Parse_Dictionary):
         self.scroll_area.setWidget(content_widget)
 
     @Slot()
-    def on_button_click(self, word):
+    def tts_button_click(self, word):
         self.engine.say(word)
         self.engine.runAndWait()
+
+    @Slot()
+    def bookmark_button_click(self, word):
+        try:
+            self.create_db()
+            word = word.capitalize()
+            success = self.insert_db(word)
+            if not success:
+                self.delete_db(word)
+        except sqlite3.Error as e:
+            print(e)
+            # NOTE: This only works with Python version 3.11 and above
+            QErrorMessage(self).showMessage(
+                e.sqlite_errorcode + " " + e.sqlite_errorname
+            )
 
 
 def main():
@@ -169,7 +237,9 @@ def main():
     widget.resize(500, 600)
     widget.show()
 
-    sys.exit(app.exec())
+    ret = app.exec()
+    widget.close_db()
+    sys.exit(ret)
 
 
 if __name__ == "__main__":

@@ -16,4 +16,5 @@ python3 pydict.py
 ## Credits
 
 Dictionary dataset is taken from here: <https://github.com/nightblade9/simple-english-dictionary/tree/main> \
-text to speech icon: <https://www.iconfinder.com/icons/9035030/volume_medium_icon>
+text to speech icon: <https://www.iconfinder.com/icons/9035030/volume_medium_icon> \
+bookmark icon: <https://www.iconfinder.com/icons/2849790/bookmark_book_multimedia_tab_media_icon>
