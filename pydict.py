@@ -111,12 +111,14 @@ class Parse_Dictionary:
         if self.data[word]["ANTONYMS"]:
             for antonym in self.data[word]["ANTONYMS"]:
                 output.append(antonym)
+                output.append(", ")
+            output.pop()
         else:
             return "No antonyms found"
 
         return "".join(output)
 
-    def get_synonym(self, word):
+    def get_synonyms(self, word):
         word = word.upper()
 
         output = []
@@ -160,7 +162,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         try:
             meanings = self.parser.get_meanings(word)
             anytonyms = self.parser.get_anytonyms(word)
-            synonyms = self.parser.get_synonym(word)
+            synonyms = self.parser.get_synonyms(word)
         except KeyError:
             pass
 
