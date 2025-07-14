@@ -148,9 +148,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         search_box.setPlaceholderText("Type to search...")
         search_box.textChanged.connect(self.search_box_changed)
 
-        content_widget = QWidget()
         self.scroll_area = QScrollArea()
-        self.scroll_area.setWidget(content_widget)
         self.scroll_area.setWidgetResizable(True)
 
         layout = QVBoxLayout(self)
