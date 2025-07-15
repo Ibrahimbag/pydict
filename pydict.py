@@ -2,6 +2,7 @@ import sys
 import json
 import pyttsx3
 import sqlite3
+from functools import partial
 from PySide6.QtCore import Slot, QRegularExpression
 from PySide6.QtGui import QIcon, QRegularExpressionValidator
 from PySide6.QtWidgets import (
@@ -25,10 +26,16 @@ class Bookmarks_Db:
             "create_table": """CREATE TABLE IF NOT EXISTS word_list (
                 word TEXT UNIQUE NOT NULL
             );""",
+            "select_words": "SELECT word FROM word_list",
             "insert_word": "INSERT INTO word_list(word) VALUES(?)",
             "delete_word": "DELETE FROM word_list WHERE word == ?",
         }
 
+    def select_words(self):
+        cursor = self.conn.cursor()
+        cursor.execute(self.sql_statements["select_words"])
+        return cursor.fetchall()
+    
     def create_db(self):
         cursor = self.conn.cursor()
         cursor.execute(self.sql_statements["create_table"])
@@ -142,18 +149,33 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.parser = self
         self.engine = pyttsx3.init()
 
-        search_box = QLineEdit()
+        self.search_box = QLineEdit()
         validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z]+"))
-        search_box.setValidator(validator)
-        search_box.setPlaceholderText("Type to search...")
-        search_box.textChanged.connect(self.search_box_changed)
+        self.search_box.setValidator(validator)
+        self.search_box.setPlaceholderText("Type to search...")
+        self.search_box.textChanged.connect(self.search_box_changed)
+
+        bookmarks_button = QPushButton("Bookmarks")
+        bookmarks_button.clicked.connect(self.bookmarks_button_clicked)
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
 
+        # TODO: Make their margin smaller
+        content_widget = QWidget()
+        layout1 = QHBoxLayout(content_widget)
+        layout1.setContentsMargins(0, 0, 0, 0)
+        content_widget2 = QWidget()
+        layout2 = QVBoxLayout(content_widget2)
+        layout2.setContentsMargins(0, 0, 0, 0)
+
+        layout1.addWidget(self.search_box)
+        layout1.addWidget(bookmarks_button)
+        layout2.addWidget(self.scroll_area)
+
         layout = QVBoxLayout(self)
-        layout.addWidget(search_box)
-        layout.addWidget(self.scroll_area)
+        layout.addWidget(content_widget)
+        layout.addWidget(content_widget2)
 
     @Slot()
     def search_box_changed(self, word):
@@ -181,7 +203,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         button_layout.addWidget(tts_button)
 
         bookmark_button = QPushButton("")
-        bookmark_button.clicked.connect(lambda: self.bookmark_button_click(word))
+        bookmark_button.clicked.connect(lambda: self.add_bookmark_button_click(word))
         bookmark_button.setFixedSize(24, 24)
         bookmark_icon = QIcon("bookmark.png")
         bookmark_button.setIcon(bookmark_icon)
@@ -208,12 +230,25 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.scroll_area.setWidget(content_widget)
 
     @Slot()
+    def bookmarks_button_clicked(self):
+        words = self.select_words()
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        self.search_box.setText("")
+        for word in words:
+            word = word[0].capitalize()
+            button = QPushButton(word)
+            button.clicked.connect(partial(self.search_box_changed, word))
+            content_layout.addWidget(button)
+        self.scroll_area.setWidget(content_widget)
+
+    @Slot()
     def tts_button_click(self, word):
         self.engine.say(word)
         self.engine.runAndWait()
 
     @Slot()
-    def bookmark_button_click(self, word):
+    def add_bookmark_button_click(self, word):
         try:
             self.create_db()
             word = word.capitalize()
