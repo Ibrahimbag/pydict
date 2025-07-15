@@ -161,7 +161,6 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
 
-        # TODO: Make their margin smaller
         content_widget = QWidget()
         layout1 = QHBoxLayout(content_widget)
         layout1.setContentsMargins(0, 0, 0, 0)
