@@ -1,5 +1,6 @@
 # PyDict
 
+![demo](demo.png) \
 A simple offline English dictionary written in Python using the PySide module
 
 ## Installation
