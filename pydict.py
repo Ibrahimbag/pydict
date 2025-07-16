@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QHBoxLayout,
     QErrorMessage,
-    QComboBox
+    QComboBox,
 )
 
 ONLINE_DICTIONARIES = {
@@ -28,6 +28,7 @@ ONLINE_DICTIONARIES = {
     "Merriam-Webster": "https://www.merriam-webster.com/dictionary/",
     "Oxford": "https://www.oed.com/search/dictionary/?scope=Entries&q=",
 }
+
 
 class Bookmarks_Db:
     def __init__(self):
@@ -284,7 +285,10 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
 
     @Slot()
     def combo_box_changed(self, index):
-        webbrowser.open(f"{ONLINE_DICTIONARIES[self.combo_box.itemText(index)]}{self.word}")
+        webbrowser.open(
+            f"{ONLINE_DICTIONARIES[self.combo_box.itemText(index)]}{self.word}"
+        )
+
 
 def main():
     app = QApplication([])
