@@ -25,8 +25,11 @@ ONLINE_DICTIONARIES = {
     "Cambridge": "https://dictionary.cambridge.org/dictionary/english/",
     "Collins": "https://www.collinsdictionary.com/dictionary/english/",
     "Dictionary.com": "https://www.dictionary.com/browse/",
+    "Longman": "https://www.ldoceonline.com/dictionary/",
     "Merriam-Webster": "https://www.merriam-webster.com/dictionary/",
     "Oxford": "https://www.oed.com/search/dictionary/?scope=Entries&q=",
+    "Oxford Learners": "https://www.oxfordlearnersdictionaries.com/definition/english/",
+    "Wiktionary": "https://en.wiktionary.org/wiki/"
 }
 
 
