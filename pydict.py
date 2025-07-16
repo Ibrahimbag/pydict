@@ -29,7 +29,7 @@ ONLINE_DICTIONARIES = {
     "Merriam-Webster": "https://www.merriam-webster.com/dictionary/",
     "Oxford": "https://www.oed.com/search/dictionary/?scope=Entries&q=",
     "Oxford Learners": "https://www.oxfordlearnersdictionaries.com/definition/english/",
-    "Wiktionary": "https://en.wiktionary.org/wiki/"
+    "Wiktionary": "https://en.wiktionary.org/wiki/",
 }
 
 
@@ -162,7 +162,6 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         Bookmarks_Db.__init__(self)
 
         self.parser = self
-        self.engine = pyttsx3.init()
 
         self.search_box = QLineEdit()
         validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z0-9-]+"))
@@ -268,8 +267,10 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
 
     @Slot()
     def tts_button_click(self, word):
-        self.engine.say(word)
-        self.engine.runAndWait()
+        try:
+            pyttsx3.speak(word)
+        except:
+            pass
 
     @Slot()
     def add_bookmark_button_click(self, word):
@@ -297,7 +298,6 @@ def main():
     app = QApplication([])
 
     widget = Widget()
-    widget.setStyleSheet("background-color: #F4F6F8;")
     widget.setWindowTitle("PyDict")
     widget.resize(500, 600)
     widget.show()

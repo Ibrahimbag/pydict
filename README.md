@@ -1,11 +1,25 @@
 # PyDict
 
-A simple English dictionary written in Python using the PySide module
+A simple offline English dictionary written in Python using the PySide module
 
-## Installation (Linux)
+## Installation
+
+### Windows
+
+Make sure you installed the Python interpreter from the [website](https://www.python.org/) or [Microsoft Store](https://apps.microsoft.com/search?query=python&hl=en-US&gl=US). \
+If installed from the website, make sure Python is in PATH.
+Next, type these commands:
 
 ```sh
-# NOTE: libxcb-cursor-dev is only for X11 on Linux
+pip install pyside6 pyttsx3
+git clone https://github.com/Ibrahimbag/dictionary.git
+cd pydict
+python3 pydict.py 
+```
+
+### Linux
+
+```sh
 sudo apt install -y python3 python3-pip libxcb-cursor-dev espeak-ng libespeak1 alsa-utils git
 pip install pyside6 pyttsx3
 git clone https://github.com/Ibrahimbag/dictionary.git
