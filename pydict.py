@@ -291,7 +291,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
     @Slot()
     def combo_box_changed(self, index):
         webbrowser.open(
-            f"{ONLINE_DICTIONARIES[self.combo_box.itemText(index)]}{self.word}"
+            f"{ONLINE_DICTIONARIES[self.combo_box.itemText(index)]}{self.word.lower()}"
         )
 
 
