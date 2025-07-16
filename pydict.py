@@ -108,9 +108,10 @@ class Parse_Dictionary:
                     output.append(related_word)
                     output.append(", ")
                 output.pop()
+                if related_words:
+                    output.append("<br><br>")
 
-                # TODO: Fix a lot of line breaks when there are no related words example word: search
-                output.append("<br><br>Examples:<br>")
+                output.append("Examples:<br>")
                 for example in examples:
                     output.append(example)
                     output.append("<br><br>")
