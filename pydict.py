@@ -2,6 +2,7 @@ import sys
 import json
 import pyttsx3
 import sqlite3
+import webbrowser
 from functools import partial
 from PySide6.QtCore import Slot, QRegularExpression
 from PySide6.QtGui import QIcon, QRegularExpressionValidator
@@ -15,8 +16,18 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QHBoxLayout,
     QErrorMessage,
+    QComboBox
 )
 
+ONLINE_DICTIONARIES = {
+    "Search online": "",
+    "Britannica": "https://www.britannica.com/dictionary/",
+    "Cambridge": "https://dictionary.cambridge.org/dictionary/english/",
+    "Collins": "https://www.collinsdictionary.com/dictionary/english/",
+    "Dictionary.com": "https://www.dictionary.com/browse/",
+    "Merriam-Webster": "https://www.merriam-webster.com/dictionary/",
+    "Oxford": "https://www.oed.com/search/dictionary/?scope=Entries&q=",
+}
 
 class Bookmarks_Db:
     def __init__(self):
@@ -35,7 +46,7 @@ class Bookmarks_Db:
         cursor = self.conn.cursor()
         cursor.execute(self.sql_statements["select_words"])
         return cursor.fetchall()
-    
+
     def create_db(self):
         cursor = self.conn.cursor()
         cursor.execute(self.sql_statements["create_table"])
@@ -178,6 +189,8 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
 
     @Slot()
     def search_box_changed(self, word):
+        self.word = word
+
         try:
             meanings = self.parser.get_meanings(word)
             anytonyms = self.parser.get_anytonyms(word)
@@ -208,6 +221,14 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         bookmark_button.setIcon(bookmark_icon)
         bookmark_button.setToolTip("Bookmark this word")
         button_layout.addWidget(bookmark_button)
+
+        self.combo_box = QComboBox()
+        self.combo_box.addItems(ONLINE_DICTIONARIES.keys())
+        model = self.combo_box.model()
+        item = model.item(0)
+        item.setEnabled(False)
+        self.combo_box.currentIndexChanged.connect(self.combo_box_changed)
+        button_layout.addWidget(self.combo_box)
 
         content_layout.addLayout(button_layout)
 
@@ -261,6 +282,9 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
                 e.sqlite_errorcode + " " + e.sqlite_errorname
             )
 
+    @Slot()
+    def combo_box_changed(self, index):
+        webbrowser.open(f"{ONLINE_DICTIONARIES[self.combo_box.itemText(index)]}{self.word}")
 
 def main():
     app = QApplication([])
