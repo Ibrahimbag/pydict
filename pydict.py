@@ -162,7 +162,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.engine = pyttsx3.init()
 
         self.search_box = QLineEdit()
-        validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z]+"))
+        validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z0-9-]+"))
         self.search_box.setValidator(validator)
         self.search_box.setPlaceholderText("Type to search...")
         self.search_box.textChanged.connect(self.search_box_changed)
