@@ -162,8 +162,6 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         Parse_Dictionary.__init__(self)
         Bookmarks_Db.__init__(self)
 
-        self.parser = self
-
         self.search_box = QLineEdit()
         validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z0-9-]+"))
         self.search_box.setValidator(validator)
@@ -196,9 +194,9 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.word = word
 
         try:
-            meanings = self.parser.get_meanings(word)
-            anytonyms = self.parser.get_anytonyms(word)
-            synonyms = self.parser.get_synonyms(word)
+            meanings = self.get_meanings(word)
+            anytonyms = self.get_anytonyms(word)
+            synonyms = self.get_synonyms(word)
         except KeyError:
             pass
 
@@ -211,7 +209,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         button_layout = QHBoxLayout()
 
         tts_button = QPushButton("")
-        tts_button.clicked.connect(lambda: self.tts_button_click(word))
+        tts_button.clicked.connect(self.tts_button_click)
         tts_button.setFixedSize(24, 24)
         tts_icon = QIcon("assets/volume-icon.png")
         tts_button.setIcon(tts_icon)
@@ -219,7 +217,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         button_layout.addWidget(tts_button)
 
         bookmark_button = QPushButton("")
-        bookmark_button.clicked.connect(lambda: self.add_bookmark_button_click(word))
+        bookmark_button.clicked.connect(self.add_bookmark_button_click)
         bookmark_button.setFixedSize(24, 24)
         bookmark_icon = QIcon("assets/bookmark.png")
         bookmark_button.setIcon(bookmark_icon)
@@ -267,17 +265,17 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.scroll_area.setWidget(content_widget)
 
     @Slot()
-    def tts_button_click(self, word):
+    def tts_button_click(self):
         try:
-            pyttsx3.speak(word)
+            pyttsx3.speak(self.word)
         except:
             pass
 
     @Slot()
-    def add_bookmark_button_click(self, word):
+    def add_bookmark_button_click(self):
         try:
             self.create_db()
-            word = word.capitalize()
+            word = self.word.capitalize()
             success = self.insert_db(word)
             if not success:
                 self.delete_db(word)
