@@ -92,15 +92,15 @@ class Parse_Dictionary:
                 output.append("<br>")
 
                 part_of_speech = meaning[0]
-                explanation = meaning[1]
+                definition = meaning[1]
                 related_words = meaning[2]
                 examples = meaning[3]
 
                 if part_of_speech:
                     output.append(part_of_speech)
                     output.append("<br><br>")
-                if explanation:
-                    output.append(explanation)
+                if definition:
+                    output.append(definition)
                     output.append("<br><br>")
 
                 output.append("Related words:<br>")
