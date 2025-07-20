@@ -13,7 +13,7 @@ Next, type these commands:
 
 ```sh
 pip install pyside6 pyttsx3
-git clone https://github.com/Ibrahimbag/dictionary.git
+git clone https://github.com/Ibrahimbag/pydict.git
 cd pydict
 python3 pydict.py 
 ```
@@ -23,7 +23,7 @@ python3 pydict.py
 ```sh
 sudo apt install -y python3 python3-pip libxcb-cursor-dev espeak-ng libespeak1 alsa-utils git
 pip install pyside6 pyttsx3
-git clone https://github.com/Ibrahimbag/dictionary.git
+git clone https://github.com/Ibrahimbag/pydict.git
 cd pydict
 python3 pydict.py
 ```
