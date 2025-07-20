@@ -4,7 +4,7 @@ import pyttsx3
 import sqlite3
 import webbrowser
 from functools import partial
-from PySide6.QtCore import Slot, QRegularExpression
+from PySide6.QtCore import Slot, QRegularExpression, Qt
 from PySide6.QtGui import QIcon, QRegularExpressionValidator
 from PySide6.QtWidgets import (
     QApplication,
@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QErrorMessage,
     QComboBox,
+    QCompleter
 )
 
 ONLINE_DICTIONARIES = {
@@ -82,6 +83,8 @@ class Parse_Dictionary:
         except Exception as e:
             print("Error loading words.json:", e)
             sys.exit(1)
+
+        self.words = [word.lower() for word in self.data.keys()]
 
     def get_meanings(self, word):
         word = word.upper()
@@ -162,7 +165,11 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         Parse_Dictionary.__init__(self)
         Bookmarks_Db.__init__(self)
 
+        completer = QCompleter(self.words)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+
         self.search_box = QLineEdit()
+        self.search_box.setCompleter(completer)
         validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z0-9-]+"))
         self.search_box.setValidator(validator)
         self.search_box.setPlaceholderText("Type to search...")
