@@ -32,6 +32,6 @@ python3 pydict.py
 
 Dictionary dataset is taken from here: <https://github.com/nightblade9/simple-english-dictionary/tree/main> \
 volume-dark icon: <https://www.iconfinder.com/icons/9035030/volume_medium_icon> \
-bookmark-dark icon: <https://www.iconfinder.com/icons/2849790/bookmark_book_multimedia_tab_media_icon>
-volume-white icon: <https://www.iconsdb.com/white-icons/volume-up-4-icon.html>
+bookmark-dark icon: <https://www.iconfinder.com/icons/2849790/bookmark_book_multimedia_tab_media_icon> \
+volume-white icon: <https://www.iconsdb.com/white-icons/volume-up-4-icon.html> \
 bookmark-white icon: <https://icons8.com/icon/KY8KFlMXWpIG/bookmark>
