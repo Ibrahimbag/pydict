@@ -167,7 +167,7 @@ class Translate(QThread):
     def __init__(self, translator, word, parent=None):
         super().__init__(parent)
         self.translator = translator
-        self.word = word if word else "..."
+        self.word = word
 
     def run(self):
         translated_text = self.translator.translate(self.word)
@@ -235,71 +235,72 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         word_label = QLabel(f"<h1>{word.capitalize()}</h1>")
         content_layout.addWidget(word_label)
 
-        button_layout = QHBoxLayout()
+        if not word == "":
+            button_layout = QHBoxLayout()
 
-        tts_button = QPushButton("")
-        tts_button.clicked.connect(self.tts_button_click)
-        tts_button.setFixedSize(24, 24)
-        tts_icon = QIcon("assets/volume-icon.png")
-        tts_button.setIcon(tts_icon)
-        tts_button.setToolTip("Read this word")
-        button_layout.addWidget(tts_button)
+            tts_button = QPushButton("")
+            tts_button.clicked.connect(self.tts_button_click)
+            tts_button.setFixedSize(24, 24)
+            tts_icon = QIcon("assets/volume-icon.png")
+            tts_button.setIcon(tts_icon)
+            tts_button.setToolTip("Read this word")
+            button_layout.addWidget(tts_button)
 
-        bookmark_button = QPushButton("")
-        bookmark_button.clicked.connect(self.add_bookmark_button_click)
-        bookmark_button.setFixedSize(24, 24)
-        bookmark_icon = QIcon("assets/bookmark.png")
-        bookmark_button.setIcon(bookmark_icon)
-        bookmark_button.setToolTip("Bookmark this word")
-        button_layout.addWidget(bookmark_button)
+            bookmark_button = QPushButton("")
+            bookmark_button.clicked.connect(self.add_bookmark_button_click)
+            bookmark_button.setFixedSize(24, 24)
+            bookmark_icon = QIcon("assets/bookmark.png")
+            bookmark_button.setIcon(bookmark_icon)
+            bookmark_button.setToolTip("Bookmark this word")
+            button_layout.addWidget(bookmark_button)
 
-        self.combo_box = QComboBox()
-        self.combo_box.addItems(ONLINE_DICTIONARIES.keys())
-        model = self.combo_box.model()
-        item = model.item(0)
-        item.setEnabled(False)
-        self.combo_box.currentIndexChanged.connect(self.combo_box_changed)
-        button_layout.addWidget(self.combo_box)
+            self.combo_box = QComboBox()
+            self.combo_box.addItems(ONLINE_DICTIONARIES.keys())
+            model = self.combo_box.model()
+            item = model.item(0)
+            item.setEnabled(False)
+            self.combo_box.currentIndexChanged.connect(self.combo_box_changed)
+            button_layout.addWidget(self.combo_box)
 
-        content_layout.addLayout(button_layout)
+            content_layout.addLayout(button_layout)
 
-        try:
-            meanings_label = QLabel(f"<b>Meanings:</b><br>{meanings}")
-            meanings_label.setWordWrap(True)
-            content_layout.addWidget(meanings_label)
+            try:
+                meanings_label = QLabel(f"<b>Meanings:</b><br>{meanings}")
+                meanings_label.setWordWrap(True)
+                content_layout.addWidget(meanings_label)
 
-            anytonyms_label = QLabel(f"<b>Antonyms:</b><br>{anytonyms}")
-            anytonyms_label.setWordWrap(True)
-            content_layout.addWidget(anytonyms_label)
+                anytonyms_label = QLabel(f"<b>Antonyms:</b><br>{anytonyms}")
+                anytonyms_label.setWordWrap(True)
+                content_layout.addWidget(anytonyms_label)
 
-            synonyms_label = QLabel(f"<b>Synonyms:</b><br>{synonyms}")
-            synonyms_label.setWordWrap(True)
-            content_layout.addWidget(synonyms_label)
-        except UnboundLocalError:
-            pass
+                synonyms_label = QLabel(f"<b>Synonyms:</b><br>{synonyms}")
+                synonyms_label.setWordWrap(True)
+                content_layout.addWidget(synonyms_label)
+            except UnboundLocalError:
+                pass
 
-        if not self.language == "en":
-            translation_widget = QWidget()
-            translation_layout = QVBoxLayout(translation_widget)
-            translation_layout.setContentsMargins(0, 0, 0, 0)
+            if not self.language == "en":
+                translation_widget = QWidget()
+                translation_layout = QVBoxLayout(translation_widget)
+                translation_layout.setContentsMargins(0, 0, 0, 0)
 
-            translation_label = QLabel("<b>Translation (Requires internet):</b>")
-            translation_label.setWordWrap(True)
-            translation_layout.addWidget(translation_label)
+                translation_label = QLabel("<b>Translation (Requires internet):</b>")
+                translation_label.setWordWrap(True)
+                translation_layout.addWidget(translation_label)
 
-            # Close previous thread if running
-            if hasattr(self, "translate_thread") and self.translate_thread.isRunning():
-                self.translate_thread.quit()
-                self.translate_thread.wait()
+                # Close previous thread if running
+                if hasattr(self, "translate_thread") and self.translate_thread.isRunning():
+                    self.translate_thread.quit()
+                    self.translate_thread.wait()
 
-            self.translation_button = QPushButton("Translate")
-            self.translation_button.setFixedSize(60, 24)
-            self.translation_button.clicked.connect(
-                partial(self.translate_button_clicked, translation_label)
-            )
-            translation_layout.addWidget(self.translation_button)
+                self.translation_button = QPushButton("Translate")
+                self.translation_button.setFixedSize(60, 24)
+                self.translation_button.clicked.connect(
+                    partial(self.translate_button_clicked, translation_label)
+                )
+                translation_layout.addWidget(self.translation_button)
 
-            content_layout.addWidget(translation_widget)
+                content_layout.addWidget(translation_widget)
 
         self.scroll_area.setWidget(content_widget)
 
