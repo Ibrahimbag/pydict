@@ -3,8 +3,10 @@ import json
 import pyttsx3
 import sqlite3
 import webbrowser
+from os_language import get_os_language
 from functools import partial
-from PySide6.QtCore import Slot, QRegularExpression, Qt
+from translate import Translator
+from PySide6.QtCore import Slot, QRegularExpression, Qt, QThread, Signal
 from PySide6.QtGui import QIcon, QRegularExpressionValidator
 from PySide6.QtWidgets import (
     QApplication,
@@ -17,7 +19,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QErrorMessage,
     QComboBox,
-    QCompleter
+    QCompleter,
 )
 
 ONLINE_DICTIONARIES = {
@@ -159,11 +161,31 @@ class Parse_Dictionary:
         return "".join(output)
 
 
+class Translate(QThread):
+    update_label = Signal(str)
+
+    def __init__(self, translator, word, parent=None):
+        super().__init__(parent)
+        self.translator = translator
+        self.word = word if word else "..."
+
+    def run(self):
+        translated_text = self.translator.translate(self.word)
+        if translated_text == self.word:
+            translated_text = "No translation found"
+        self.update_label.emit("<b>Translation:</b><br>" + translated_text)
+
+
 class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
     def __init__(self):
         QWidget.__init__(self)
         Parse_Dictionary.__init__(self)
         Bookmarks_Db.__init__(self)
+
+        self.language = get_os_language()
+        if self.language == None:
+            self.language = "en"
+        self.translator = Translator(to_lang=self.language)
 
         completer = QCompleter(self.words)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -256,6 +278,29 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         except UnboundLocalError:
             pass
 
+        if not self.language == "en":
+            translation_widget = QWidget()
+            translation_layout = QVBoxLayout(translation_widget)
+            translation_layout.setContentsMargins(0, 0, 0, 0)
+
+            translation_label = QLabel("<b>Translation (Requires internet):</b>")
+            translation_label.setWordWrap(True)
+            translation_layout.addWidget(translation_label)
+
+            # Close previous thread if running
+            if hasattr(self, "translate_thread") and self.translate_thread.isRunning():
+                self.translate_thread.quit()
+                self.translate_thread.wait()
+
+            self.translation_button = QPushButton("Translate")
+            self.translation_button.setFixedSize(60, 24)
+            self.translation_button.clicked.connect(
+                partial(self.translate_button_clicked, translation_label)
+            )
+            translation_layout.addWidget(self.translation_button)
+
+            content_layout.addWidget(translation_widget)
+
         self.scroll_area.setWidget(content_widget)
 
     @Slot()
@@ -298,6 +343,13 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         webbrowser.open(
             f"{ONLINE_DICTIONARIES[self.combo_box.itemText(index)]}{self.word.lower()}"
         )
+
+    @Slot()
+    def translate_button_clicked(self, translation_label):
+        self.translation_button.hide()
+        self.translate_thread = Translate(self.translator, self.word)
+        self.translate_thread.update_label.connect(translation_label.setText)
+        self.translate_thread.start()
 
 
 def main():
