@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QErrorMessage,
     QComboBox,
     QCompleter,
+    QMessageBox
 )
 
 ONLINE_DICTIONARIES = {
@@ -69,7 +70,12 @@ class Bookmarks_Db:
             return False
         return True
 
-    def delete_db(self, word):
+    def delete_db(self, word, show_dialog=None):
+        if show_dialog is not None:
+            ret = show_dialog()
+            if not ret:
+                return
+
         cursor = self.conn.cursor()
         cursor.execute(self.sql_statements["delete_word"], (word,))
         self.conn.commit()
@@ -294,7 +300,10 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
                 translation_layout.addWidget(translation_label)
 
                 # Close previous thread if running
-                if hasattr(self, "translate_thread") and self.translate_thread.isRunning():
+                if (
+                    hasattr(self, "translate_thread")
+                    and self.translate_thread.isRunning()
+                ):
                     self.translate_thread.quit()
                     self.translate_thread.wait()
 
@@ -315,12 +324,42 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
         self.search_box.setText("")
+
         for word in words:
+            button_layout = QHBoxLayout()
+
+            delete_button = QPushButton("X")
+            delete_button.setFixedSize(24, 24)
+            delete_button.setStyleSheet(
+                "QPushButton::Hover {" "background-color: red; color: white;" "}"
+            )
             word = word[0].capitalize()
-            button = QPushButton(word)
-            button.clicked.connect(partial(self.search_box_changed, word))
-            content_layout.addWidget(button)
+            delete_button.clicked.connect(partial(self.delete_db, word, self.show_dialog))
+            delete_button.clicked.connect(self.bookmarks_button_clicked)
+            button_layout.addWidget(delete_button)
+
+            word_button = QPushButton(word)
+            word_button.clicked.connect(partial(self.search_box_changed, word))
+            button_layout.addWidget(word_button)
+
+            content_layout.addLayout(button_layout)
+
         self.scroll_area.setWidget(content_widget)
+
+    @Slot()
+    def show_dialog(self):
+        reply = QMessageBox.question(
+            self,
+            "Confirm",
+            "Are you sure you want to remove this word?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No  # Default button
+        )
+
+        if reply == QMessageBox.Yes:
+            return True
+        else:
+            return False
 
     @Slot()
     def tts_button_click(self):
