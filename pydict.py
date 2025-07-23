@@ -171,8 +171,6 @@ class Translate(QThread):
 
     def run(self):
         translated_text = self.translator.translate(self.word)
-        if translated_text == self.word:
-            translated_text = "No translation found"
         self.update_label.emit("<b>Translation:</b><br>" + translated_text)
 
 
