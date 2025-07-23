@@ -3,6 +3,7 @@ import json
 import pyttsx3
 import sqlite3
 import webbrowser
+import darkdetect
 from os_language import get_os_language
 from functools import partial
 from translate import Translator
@@ -239,7 +240,10 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
             tts_button = QPushButton("")
             tts_button.clicked.connect(self.tts_button_click)
             tts_button.setFixedSize(24, 24)
-            tts_icon = QIcon("assets/volume-icon.png")
+            if darkdetect.isLight():
+                tts_icon = QIcon("assets/volume-dark.png")
+            else:
+                tts_icon = QIcon("assets/volume-white.png")
             tts_button.setIcon(tts_icon)
             tts_button.setToolTip("Read this word")
             button_layout.addWidget(tts_button)
@@ -247,7 +251,10 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
             bookmark_button = QPushButton("")
             bookmark_button.clicked.connect(self.add_bookmark_button_click)
             bookmark_button.setFixedSize(24, 24)
-            bookmark_icon = QIcon("assets/bookmark.png")
+            if darkdetect.isLight():
+                bookmark_icon = QIcon("assets/bookmark-dark.png")
+            else:
+                bookmark_icon = QIcon("assets/bookmark-white.png")
             bookmark_button.setIcon(bookmark_icon)
             bookmark_button.setToolTip("Bookmark this word")
             button_layout.addWidget(bookmark_button)

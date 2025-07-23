@@ -12,7 +12,7 @@ If installed from the website, make sure Python is in PATH.
 Next, type these commands:
 
 ```sh
-pip install pyside6 pyttsx3 translate
+pip install pyside6 pyttsx3 translate darkdetect
 git clone https://github.com/Ibrahimbag/pydict.git
 cd pydict
 python3 pydict.py 
@@ -22,7 +22,7 @@ python3 pydict.py
 
 ```sh
 sudo apt install -y python3 python3-pip libxcb-cursor-dev espeak-ng libespeak1 alsa-utils git
-pip install pyside6 pyttsx3 translate
+pip install pyside6 pyttsx3 translate darkdetect
 git clone https://github.com/Ibrahimbag/pydict.git
 cd pydict
 python3 pydict.py
@@ -31,5 +31,7 @@ python3 pydict.py
 ## Credits
 
 Dictionary dataset is taken from here: <https://github.com/nightblade9/simple-english-dictionary/tree/main> \
-text to speech icon: <https://www.iconfinder.com/icons/9035030/volume_medium_icon> \
-bookmark icon: <https://www.iconfinder.com/icons/2849790/bookmark_book_multimedia_tab_media_icon>
+volume-dark icon: <https://www.iconfinder.com/icons/9035030/volume_medium_icon> \
+bookmark-dark icon: <https://www.iconfinder.com/icons/2849790/bookmark_book_multimedia_tab_media_icon>
+volume-white icon: <https://www.iconsdb.com/white-icons/volume-up-4-icon.html>
+bookmark-white icon: <https://icons8.com/icon/KY8KFlMXWpIG/bookmark>
