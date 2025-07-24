@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
     QErrorMessage,
     QComboBox,
     QCompleter,
-    QMessageBox
+    QMessageBox,
 )
 
 ONLINE_DICTIONARIES = {
@@ -334,7 +334,9 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
                 "QPushButton::Hover {" "background-color: red; color: white;" "}"
             )
             word = word[0].capitalize()
-            delete_button.clicked.connect(partial(self.delete_db, word, self.show_dialog))
+            delete_button.clicked.connect(
+                partial(self.delete_db, word, self.show_dialog)
+            )
             delete_button.clicked.connect(self.bookmarks_button_clicked)
             button_layout.addWidget(delete_button)
 
@@ -346,14 +348,13 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
 
         self.scroll_area.setWidget(content_widget)
 
-    @Slot()
     def show_dialog(self):
         reply = QMessageBox.question(
             self,
             "Confirm",
             "Are you sure you want to remove this word?",
             QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No  # Default button
+            QMessageBox.No,  # Default button
         )
 
         if reply == QMessageBox.Yes:
