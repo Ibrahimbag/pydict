@@ -335,7 +335,8 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         content_layout = QVBoxLayout(content_widget)
         self.search_box.setText("")
 
-        for word in words:
+        words = [word[0] for word in words]
+        for word in sorted(words):
             button_layout = QHBoxLayout()
 
             delete_button = QPushButton("X")
@@ -343,7 +344,6 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
             delete_button.setStyleSheet(
                 "QPushButton::Hover {" "background-color: red; color: white;" "}"
             )
-            word = word[0].capitalize()
             delete_button.clicked.connect(
                 partial(self.delete_db, word, self.show_dialog)
             )
