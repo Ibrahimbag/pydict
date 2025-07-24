@@ -187,6 +187,8 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         Parse_Dictionary.__init__(self)
         Bookmarks_Db.__init__(self)
 
+        self.create_db()
+
         self.language = get_os_language()
         if self.language == None:
             self.language = "en"
@@ -380,7 +382,6 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
     @Slot()
     def add_bookmark_button_click(self):
         try:
-            self.create_db()
             word = self.word.capitalize()
             success = self.insert_db(word)
             if not success:
