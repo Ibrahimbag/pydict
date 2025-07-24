@@ -240,6 +240,8 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         word_label = QLabel(f"<h1>{word.capitalize()}</h1>")
         content_layout.addWidget(word_label)
 
+        words = self.select_words()
+
         if not word == "":
             button_layout = QHBoxLayout()
 
@@ -254,16 +256,22 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
             tts_button.setToolTip("Read this word")
             button_layout.addWidget(tts_button)
 
-            bookmark_button = QPushButton("")
-            bookmark_button.clicked.connect(self.add_bookmark_button_click)
-            bookmark_button.setFixedSize(24, 24)
+            self.bookmark_button = QPushButton("")
+            self.bookmark_button.clicked.connect(self.add_bookmark_button_click)
+            self.bookmark_button.setFixedSize(24, 24)
             if darkdetect.isLight():
-                bookmark_icon = QIcon("assets/bookmark-dark.png")
+                if (word.capitalize(),) in words:
+                    bookmark_icon = QIcon("assets/bookmark-dark-filled.png")
+                else:
+                    bookmark_icon = QIcon("assets/bookmark-dark.png")
             else:
-                bookmark_icon = QIcon("assets/bookmark-white.png")
-            bookmark_button.setIcon(bookmark_icon)
-            bookmark_button.setToolTip("Bookmark this word")
-            button_layout.addWidget(bookmark_button)
+                if (word.capitalize(),) in words:
+                    bookmark_icon = QIcon("assets/bookmark-white-filled.png")
+                else:
+                    bookmark_icon = QIcon("assets/bookmark-white.png")
+            self.bookmark_button.setIcon(bookmark_icon)
+            self.bookmark_button.setToolTip("Bookmark this word")
+            button_layout.addWidget(self.bookmark_button)
 
             self.combo_box = QComboBox()
             self.combo_box.addItems(ONLINE_DICTIONARIES.keys())
@@ -377,6 +385,17 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
             success = self.insert_db(word)
             if not success:
                 self.delete_db(word)
+                if darkdetect.isLight():
+                    bookmark_icon = QIcon("assets/bookmark-dark.png")
+                else:
+                    bookmark_icon = QIcon("assets/bookmark-white.png")
+                self.bookmark_button.setIcon(bookmark_icon)
+            else:
+                if darkdetect.isLight():
+                    bookmark_icon = QIcon("assets/bookmark-dark-filled.png")
+                else:
+                    bookmark_icon = QIcon("assets/bookmark-white-filled.png")
+                self.bookmark_button.setIcon(bookmark_icon)
         except sqlite3.Error as e:
             print(e)
             # NOTE: This only works with Python version 3.11 and above
