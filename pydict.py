@@ -46,7 +46,7 @@ class Bookmarks_Db:
             "create_table": """CREATE TABLE IF NOT EXISTS word_list (
                 word TEXT UNIQUE NOT NULL
             );""",
-            "select_words": "SELECT word FROM word_list",
+            "select_words": "SELECT word FROM word_list ORDER BY word",
             "insert_word": "INSERT INTO word_list(word) VALUES(?)",
             "delete_word": "DELETE FROM word_list WHERE word == ?",
         }
@@ -335,8 +335,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         content_layout = QVBoxLayout(content_widget)
         self.search_box.setText("")
 
-        words = [word[0] for word in words]
-        for word in sorted(words):
+        for (word,) in words:
             button_layout = QHBoxLayout()
 
             delete_button = QPushButton("X")
