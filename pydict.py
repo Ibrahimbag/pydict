@@ -93,7 +93,7 @@ class Parse_Dictionary:
             print("Error loading words.json:", e)
             sys.exit(1)
 
-        self.words = [word.lower() for word in self.data.keys()]
+        self.all_words = [word.lower() for word in self.data.keys()]
 
     def get_meanings(self, word):
         word = word.upper()
@@ -181,20 +181,20 @@ class Translate(QThread):
         self.update_label.emit("<b>Translation:</b><br>" + translated_text)
 
 
-class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
+class Widget(QWidget):
     def __init__(self):
-        QWidget.__init__(self)
-        Parse_Dictionary.__init__(self)
-        Bookmarks_Db.__init__(self)
+        super().__init__()
+        self.bookmarks_db = Bookmarks_Db()
+        self.parse_dictionary = Parse_Dictionary()
 
-        self.create_db()
+        self.bookmarks_db.create_db()
 
         self.language = get_os_language()
         if self.language == None:
             self.language = "en"
         self.translator = Translator(to_lang=self.language)
 
-        completer = QCompleter(self.words)
+        completer = QCompleter(self.parse_dictionary.all_words)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
 
         self.search_box = QLineEdit()
@@ -230,9 +230,9 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         self.word = word
 
         try:
-            meanings = self.get_meanings(word)
-            anytonyms = self.get_anytonyms(word)
-            synonyms = self.get_synonyms(word)
+            meanings = self.parse_dictionary.get_meanings(word)
+            anytonyms = self.parse_dictionary.get_anytonyms(word)
+            synonyms = self.parse_dictionary.get_synonyms(word)
         except KeyError:
             pass
 
@@ -242,7 +242,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
         word_label = QLabel(f"<h1>{word.capitalize()}</h1>")
         content_layout.addWidget(word_label)
 
-        words = self.select_words()
+        words = self.bookmarks_db.select_words()
 
         if not word == "":
             button_layout = QHBoxLayout()
@@ -330,7 +330,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
 
     @Slot()
     def bookmarks_button_clicked(self):
-        words = self.select_words()
+        words = self.bookmarks_db.select_words()
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
         self.search_box.setText("")
@@ -344,7 +344,7 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
                 "QPushButton::Hover {" "background-color: red; color: white;" "}"
             )
             delete_button.clicked.connect(
-                partial(self.delete_db, word, self.show_dialog)
+                partial(self.bookmarks_db.delete_db, word, self.show_dialog)
             )
             delete_button.clicked.connect(self.bookmarks_button_clicked)
             button_layout.addWidget(delete_button)
@@ -382,9 +382,9 @@ class Widget(QWidget, Parse_Dictionary, Bookmarks_Db):
     def add_bookmark_button_click(self):
         try:
             word = self.word.capitalize()
-            success = self.insert_db(word)
+            success = self.bookmarks_db.insert_db(word)
             if not success:
-                self.delete_db(word)
+                self.bookmarks_db.delete_db(word)
                 if darkdetect.isLight():
                     bookmark_icon = QIcon("assets/bookmark-dark.png")
                 else:
@@ -426,7 +426,7 @@ def main():
     widget.show()
 
     ret = app.exec()
-    widget.close_db()
+    widget.bookmarks_db.close_db()
     sys.exit(ret)
 
 
