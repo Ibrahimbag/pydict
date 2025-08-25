@@ -7,7 +7,14 @@ import darkdetect
 from os_language import get_os_language
 from functools import partial
 from translate import Translator
-from PySide6.QtCore import Slot, QRegularExpression, Qt, QThread, Signal
+from PySide6.QtCore import (
+    Slot,
+    QRegularExpression,
+    Qt,
+    QThread,
+    Signal,
+    QStringListModel,
+)
 from PySide6.QtGui import QIcon, QRegularExpressionValidator
 from PySide6.QtWidgets import (
     QApplication,
@@ -181,6 +188,31 @@ class Translate(QThread):
         self.update_label.emit("<b>Translation:</b><br>" + translated_text)
 
 
+class LimitedCompleter(QCompleter):
+    def __init__(self, words, parent=None, limit=500):
+        super().__init__(parent)
+        self.all_words = words
+        self.limit = limit
+        self.model = QStringListModel()
+        self.setModel(self.model)
+
+    def updateModel(self, text):
+        if text:
+            matches = [
+                w.capitalize()
+                for w in self.all_words
+                if w.lower().startswith(text.lower())
+            ]
+            matches = matches[: self.limit]
+        else:
+            matches = []
+        self.model.setStringList(matches)
+
+    def splitPath(self, path):
+        self.updateModel(path)
+        return super().splitPath(path)
+
+
 class Widget(QWidget):
     def __init__(self):
         super().__init__()
@@ -194,10 +226,9 @@ class Widget(QWidget):
             self.language = "en"
         self.translator = Translator(to_lang=self.language)
 
-        completer = QCompleter(self.parse_dictionary.all_words)
-        completer.setCaseSensitivity(Qt.CaseInsensitive)
-
         self.search_box = QLineEdit()
+        completer = LimitedCompleter(self.parse_dictionary.all_words, self.search_box)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.search_box.setCompleter(completer)
         validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z0-9-\.']+"))
         self.search_box.setValidator(validator)
