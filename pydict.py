@@ -227,7 +227,7 @@ class Widget(QWidget):
         self.translator = Translator(to_lang=self.language)
 
         self.search_box = QLineEdit()
-        completer = LimitedCompleter(self.parse_dictionary.all_words, self.search_box)
+        completer = LimitedCompleter(self.parse_dictionary.all_words)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.search_box.setCompleter(completer)
         validator = QRegularExpressionValidator(QRegularExpression(r"[a-zA-Z0-9-\.']+"))
